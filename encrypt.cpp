@@ -3,6 +3,9 @@
 #include <string>
 #include <fstream>
 #include <vector>
+#include <memory>
+#include <stdexcept>
+#include <cstdio>
 using namespace std;
 
 //Encryption variables
@@ -30,6 +33,19 @@ string charToString(char c){
   ss>>retval;
   return retval;
 }
+
+string exec(const char* cmd) {
+    char buffer[128];
+    string result = "";
+    shared_ptr<FILE> pipe(popen(cmd, "r"), pclose);
+    if (!pipe) throw runtime_error("popen() failed!");
+    while (!feof(pipe.get())) {
+        if (fgets(buffer, 128, pipe.get()) != NULL)
+            result += buffer;
+    }
+    return result;
+}
+
 
 //Encryption functions
 
@@ -87,11 +103,10 @@ string genRandomString(const int len) {
     return s;
 }
 
-void encrypt(char key){
-  string encrypted="";
-  for (int temp = 0; temp < input.size(); temp++){
-    encrypted += input[temp] ^ (int(key) + temp) % 255;
-  }
+void encrypt(){
+  string excrypted;
+  string command= "python -c encrypt.py '"+input+"'";
+  excrypted =exec(command);
   input=encrypted;
 }
 
@@ -200,11 +215,10 @@ void writeOutD(){
   finalOut.close();
 }
 
-void decrypt(char key){
-  string decrypted="";
-  for (int temp = 0; temp < finalOutput.size(); temp++){
-    decrypted += finalOutput[temp] ^ (int(key) + temp) % 255;
-  }
+void decrypt(){
+  string decrypted;
+  string command= "python -c decrypt.py '"+finalOutput+"'";
+  decrypted =exec(command);
   finalOutput=decrypted;
 }
 
@@ -217,8 +231,7 @@ int main(){
         splitText.push_back("");
       }
       getText("text.txt");
-      string ePass=genRandomString(1);
-      //encrypt(ePass[0]);
+      encrypt();
       split(input,numSplits);
       for (size_t i = 0; i < numSplits; i++) {
         string rand=genRandomString(12);
@@ -232,6 +245,7 @@ int main(){
       parseRecord();
       getFiles();
       defrag();
+      decrypt();
       //decrypt(encryptionPass[0]);
       writeOutD();
     }else{
