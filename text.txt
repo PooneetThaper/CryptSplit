@@ -1,0 +1,14 @@
+Full he none no side. Please work...
+
+This is the next line    .
+There were 4 spaces before the period, did it register?
+!@#$%^&*()-+
+
+Here are more tests....
+$$$$$$$$$$$ 4$$ $ $ $
+ThereAreNoSpacesHere!!!!
+
+Enough tests:
+HERE IS THE SECRET KEY:
+.................
+{flag:CryptSplit}
